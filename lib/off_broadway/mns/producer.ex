@@ -52,7 +52,7 @@ defmodule OffBroadway.MNS.Producer do
   @impl true
   def handle_demand(incoming_demand, state = %{demand: old_demand}) do
     case old_demand + incoming_demand do
-      demand when old_demand <= 0 and demand > 0 ->
+      demand when old_demand <= 0 and demand >= 0 ->
         Receiver.start_receive(state.receiver)
         {:noreply, [], %{state | demand: demand}}
 
@@ -84,14 +84,13 @@ defmodule OffBroadway.MNS.Producer do
         end
       )
 
-    case old_demand - length(messages) do
-      demand when old_demand > 0 and demand <= 0 ->
-        Receiver.stop_receive(state.receiver)
-        {:noreply, messages, %{state | demand: demand}}
+    demand = old_demand - length(messages)
 
-      demand ->
-        {:noreply, messages, %{state | demand: demand}}
+    if demand <= 0 do
+      Receiver.stop_receive(state.receiver)
     end
+
+    {:noreply, messages, %{state | demand: demand}}
   end
 
   def handle_info(info, state) do

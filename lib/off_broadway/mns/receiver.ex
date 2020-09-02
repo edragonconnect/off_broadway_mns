@@ -56,23 +56,23 @@ defmodule OffBroadway.MNS.Receiver do
         %{queue: queue, receive_opts: opts} = data
       ) do
     # receiving -> resting
-    case MNS.receive_message(queue, opts) do
-      {:ok, %{body: %{"Messages" => messages}}} ->
-        # Logger.info("receive message get:" <> inspect(messages))
-        Process.send(data.parent, {:receive, messages}, [:noconnect])
-        {:noreply, data, {:continue, :receive_message}}
-        {:next_state, :resting, data, [{:state_timeout, 100, :go_receiving}]}
+    timeout =
+      case MNS.receive_message(queue, opts) do
+        {:ok, %{body: %{"Messages" => messages}}} ->
+          # Logger.info("receive message get:" <> inspect(messages))
+          Process.send(data.parent, {:receive, messages}, [:noconnect])
+          100
 
-      {:error, %{body: %{"Error" => %{"Code" => "MessageNotExist"}}}} ->
-        {:next_state, :resting, data,
-         [{:state_timeout, data.retry_receive_message_interval, :go_receiving}]}
+        {:error, %{body: %{"Error" => %{"Code" => "MessageNotExist"}}}} ->
+          data.retry_receive_message_interval
 
-      error ->
-        Logger.warn("receive message error:" <> inspect(error))
+        error ->
+          Logger.warn("receive message error:" <> inspect(error))
 
-        {:next_state, :resting, data,
-         [{:state_timeout, data.retry_receive_message_interval, :go_receiving}]}
-    end
+          data.retry_receive_message_interval
+      end
+
+    {:next_state, :resting, data, [{:state_timeout, timeout, :go_receiving}]}
   end
 
   def handle_event(:cast, :start, _, _data) do
