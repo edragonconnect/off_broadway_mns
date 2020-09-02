@@ -86,7 +86,7 @@ defmodule OffBroadway.MNS.Producer do
 
     demand = old_demand - length(messages)
 
-    if demand <= 0 do
+    if old_demand > 0 && demand <= 0 do
       Receiver.stop_receive(state.receiver)
     end
 
