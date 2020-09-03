@@ -2,11 +2,8 @@ defmodule OffBroadway.MNS.Producer do
   @moduledoc """
   A Aliyun MNS producer for Broadway.
   """
-
   use GenStage
-
   require Logger
-
   alias Broadway.{Message, Acknowledger, Producer}
   alias ExAliyun.MNS
 
@@ -14,7 +11,6 @@ defmodule OffBroadway.MNS.Producer do
   @behaviour Producer
   @max_batch_size 16
   @queue_url_prefix "queues/"
-  @default_receive_opts [number: @max_batch_size]
   @default_retry_receive_message_interval 5_000
 
   @impl true
@@ -29,21 +25,17 @@ defmodule OffBroadway.MNS.Producer do
 
     queue = @queue_url_prefix <> queue
 
-    {receive_opts, opts} = Keyword.pop(opts, :receive_opts, @default_receive_opts)
-
-    prefetch_count = Keyword.fetch!(receive_opts, :number)
-    options = producer_options(gen_stage_opts, prefetch_count)
+    {receive_opts, _opts} = Keyword.pop(opts, :receive_opts, [])
 
     state = %{
       queue: queue,
       receive_opts: receive_opts,
       receive_interval: receive_interval,
       receive_timer: nil,
-      opts: opts,
       demand: 0
     }
 
-    {:producer, state, options}
+    {:producer, state, gen_stage_opts}
   end
 
   @impl true
@@ -72,7 +64,7 @@ defmodule OffBroadway.MNS.Producer do
   end
 
   defp handle_receive_messages(%{receive_timer: nil, demand: demand} = state) when demand > 0 do
-    messages = receive_messages_from_mns(state.queue, state.receive_opts)
+    messages = receive_messages_from_mns(demand, state.queue, state.receive_opts)
     new_demand = demand - length(messages)
 
     receive_timer =
@@ -89,8 +81,10 @@ defmodule OffBroadway.MNS.Producer do
     {:noreply, [], state}
   end
 
-  defp receive_messages_from_mns(queue, opts) do
-    case MNS.receive_message(queue, opts) do
+  defp receive_messages_from_mns(demand, queue, opts) do
+    number = min(demand, @max_batch_size)
+
+    case MNS.receive_message(queue, [{:number, number} | opts]) do
       {:ok, %{body: %{"Messages" => messages}}} ->
         # Logger.info("receive message get:" <> inspect(messages))
         Enum.map(messages, &transform(&1, queue))
@@ -145,17 +139,5 @@ defmodule OffBroadway.MNS.Producer do
     end)
 
     :ok
-  end
-
-  defp producer_options(opts, 0) do
-    if opts[:buffer_size] do
-      opts
-    else
-      raise ArgumentError, ":prefetch_count is 0, specify :buffer_size explicitly"
-    end
-  end
-
-  defp producer_options(opts, prefetch_count) do
-    Keyword.put_new(opts, :buffer_size, prefetch_count * 5)
   end
 end
