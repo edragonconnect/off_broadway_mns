@@ -24,8 +24,8 @@ defmodule OffBroadwayMns.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:broadway, "0.6.2"},
-      {:ex_aliyun_mns, "~> 1.0"}
+      {:broadway, "~> 0.6"},
+      {:ex_aliyun_mns, "~> 1.2"}
     ]
   end
 end
