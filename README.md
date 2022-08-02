@@ -10,7 +10,7 @@ by adding `off_broadway_mns` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:off_broadway_mns, "~> 0.6.0"}
+    {:off_broadway_mns, "~> 1.0"}
   ]
 end
 ```

@@ -5,7 +5,7 @@ defmodule OffBroadwayMns.MixProject do
     [
       app: :off_broadway_mns,
       # same as broadway
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.8",
       name: "OffBroadwayMNS",
       description: "A Aliyun MNS connector for Broadway",
@@ -24,7 +24,7 @@ defmodule OffBroadwayMns.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:broadway, "~> 0.6"},
+      {:broadway, "~> 1.0"},
       {:ex_aliyun_mns, "~> 1.2"}
     ]
   end
