@@ -1,16 +1,19 @@
 defmodule OffBroadwayMns.MixProject do
   use Mix.Project
 
+  @app :off_broadway_mns
+  @source_url "https://github.com/edragonconnect/off_broadway_mns"
+
   def project do
     [
-      app: :off_broadway_mns,
+      app: @app,
       # same as broadway
-      version: "1.0.0",
+      version: "1.0.5",
       elixir: "~> 1.8",
-      name: "OffBroadwayMNS",
-      description: "A Aliyun MNS connector for Broadway",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      docs: docs(),
+      package: package()
     ]
   end
 
@@ -25,7 +28,31 @@ defmodule OffBroadwayMns.MixProject do
   defp deps do
     [
       {:broadway, "~> 1.0"},
-      {:ex_aliyun_mns, "~> 1.2"}
+      {:ex_aliyun_mns, "~> 1.2"},
+      {:ex_doc, ">= 0.0.0", only: [:docs, :dev], runtime: false}
+    ]
+  end
+  defp docs do
+    [
+      extras: [
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"]
+      ],
+      main: "readme",
+      source_url: @source_url,
+      formatters: ["html"],
+      formatter_opts: [gfm: true]
+    ]
+  end
+
+  defp package do
+    [
+      name: "off_broadway_mns",
+      description: "A Aliyun MNS connector for Broadway",
+      files: ["lib", "mix.exs", "README.md", "LICENSE.md"],
+      maintainers: ["feng19"],
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 end
