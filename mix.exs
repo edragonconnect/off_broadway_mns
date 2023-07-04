@@ -8,7 +8,7 @@ defmodule OffBroadwayMns.MixProject do
     [
       app: @app,
       # same as broadway
-      version: "1.0.5",
+      version: "1.0.7",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),

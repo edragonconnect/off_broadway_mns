@@ -25,7 +25,7 @@ defmodule OffBroadway.MNS.Producer do
 
     queue = @queue_url_prefix <> queue
 
-    {receive_opts, _opts} = Keyword.pop(opts, :receive_opts, [])
+    {receive_opts, _opts} = Keyword.pop(opts, :receive_opts, wait_time_seconds: 30)
 
     state = %{
       queue: queue,
