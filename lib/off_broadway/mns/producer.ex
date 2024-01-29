@@ -53,7 +53,7 @@ defmodule OffBroadway.MNS.Producer do
   end
 
   def handle_info(info, state) do
-    Logger.warn("unsupported message: " <> inspect(info))
+    Logger.warning("unsupported message: " <> inspect(info))
     {:noreply, [], state}
   end
 
@@ -93,7 +93,7 @@ defmodule OffBroadway.MNS.Producer do
         []
 
       error ->
-        Logger.warn("receive message error:" <> inspect(error))
+        Logger.warning("receive message error:" <> inspect(error))
 
         []
     end
