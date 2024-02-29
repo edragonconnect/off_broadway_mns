@@ -8,7 +8,7 @@ defmodule OffBroadwayMns.MixProject do
     [
       app: @app,
       # same as broadway
-      version: "1.0.8",
+      version: "1.0.9",
       elixir: "~> 1.8",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -40,6 +40,7 @@ defmodule OffBroadwayMns.MixProject do
       ],
       main: "readme",
       source_url: @source_url,
+      source_ref: "master",
       formatters: ["html"],
       formatter_opts: [gfm: true]
     ]
